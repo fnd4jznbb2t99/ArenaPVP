@@ -49,3 +49,4 @@ contracts/deployments/*.json
 # Lock files (keep one)
 package-lock.json
 bun.lockb
+.vercel

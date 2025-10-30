@@ -1,5 +1,4 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Ticket } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export const Header = () => {
@@ -12,7 +11,7 @@ export const Header = () => {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center glow-primary">
-              <Ticket className="w-6 h-6 text-primary-foreground" />
+              <img src="/favicon.svg" alt="Arena" className="w-6 h-6" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Arena

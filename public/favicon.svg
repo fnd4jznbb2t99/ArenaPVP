@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- ArenaPVP lottery emblem: ticket + number balls -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B1220"/>
+      <stop offset="100%" stop-color="#0A0F1A"/>
+    </linearGradient>
+    <linearGradient id="ticket" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD87A"/>
+      <stop offset="100%" stop-color="#FFB347"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3CCBFF"/>
+      <stop offset="100%" stop-color="#00A8FF"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="16" ry="16" fill="url(#bg)"/>
+
+  <!-- Ticket shape -->
+  <g transform="translate(18,26)">
+    <path d="M8 0h68c4 0 8 4 8 8v6c-6 0-10 4-10 10s4 10 10 10v6c0 4-4 8-8 8H8c-4 0-8-4-8-8v-6c6 0 10-4 10-10S6 14 0 14V8C0 4 4 0 8 0z" fill="url(#ticket)"/>
+    <rect x="10" y="10" width="64" height="28" rx="4" ry="4" fill="#0B1220" opacity="0.15"/>
+    <g fill="#0B1220">
+      <rect x="16" y="16" width="10" height="4" rx="2"/>
+      <rect x="32" y="16" width="10" height="4" rx="2"/>
+      <rect x="48" y="16" width="10" height="4" rx="2"/>
+    </g>
+  </g>
+
+  <!-- Lottery balls -->
+  <g transform="translate(20,76)">
+    <circle cx="18" cy="18" r="14" fill="white"/>
+    <circle cx="54" cy="14" r="12" fill="white"/>
+    <circle cx="86" cy="20" r="10" fill="white"/>
+    <circle cx="18" cy="18" r="14" fill="none" stroke="#E5EAF2" stroke-width="2"/>
+    <circle cx="54" cy="14" r="12" fill="none" stroke="#E5EAF2" stroke-width="2"/>
+    <circle cx="86" cy="20" r="10" fill="none" stroke="#E5EAF2" stroke-width="2"/>
+    <text x="18" y="22" text-anchor="middle" font-family="ui-sans-serif, Arial" font-size="12" fill="#0B1220">7</text>
+    <text x="54" y="18" text-anchor="middle" font-family="ui-sans-serif, Arial" font-size="10" fill="#0B1220">12</text>
+    <text x="86" y="23" text-anchor="middle" font-family="ui-sans-serif, Arial" font-size="9" fill="#0B1220">3</text>
+  </g>
+
+  <!-- Accent ring -->
+  <rect x="6" y="6" width="116" height="116" rx="14" ry="14" fill="none" stroke="url(#cyan)" stroke-width="2"/>
+</svg>
+
+

@@ -111,13 +111,15 @@ const About = () => {
                   <Eye className="w-5 h-5 text-primary" />
                   How It Works - Video Demo
                 </h4>
-                <div className="w-full aspect-video bg-gradient-to-br from-primary/20 to-cyan-500/20 rounded-lg flex items-center justify-center border border-primary/20">
-                  <div className="text-center">
-                    <Eye className="w-20 h-20 text-primary mx-auto mb-4" />
-                    <p className="text-lg font-medium text-foreground mb-2">Video Demo Placeholder</p>
-                    <p className="text-base text-muted-foreground">Coming Soon</p>
-                    <p className="text-sm text-muted-foreground/70 mt-2">Watch the complete lottery flow in action</p>
-                  </div>
+                <div className="w-full aspect-video bg-black rounded-lg overflow-hidden border border-primary/20">
+                  <video
+                    controls
+                    className="w-full h-full"
+                    poster="/demovedio.mp4"
+                  >
+                    <source src="/demovedio.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
                 </div>
               </div>
             </div>
@@ -281,12 +283,15 @@ const About = () => {
                 <Eye className="w-6 h-6 text-primary" />
                 Video Tutorial
               </h4>
-              <div className="w-full aspect-video bg-gradient-to-br from-primary/10 to-cyan-500/10 rounded-lg flex items-center justify-center border border-primary/10">
-                <div className="text-center">
-                  <Eye className="w-24 h-24 text-primary/40 mx-auto mb-6" />
-                  <p className="text-lg font-medium text-foreground mb-3">Complete Video Demo</p>
-                  <p className="text-base text-muted-foreground">Coming Soon - Full walkthrough of the platform</p>
-                </div>
+              <div className="w-full aspect-video bg-black rounded-lg overflow-hidden border border-primary/10">
+                <video
+                  controls
+                  className="w-full h-full"
+                  poster="/demovedio.mp4"
+                >
+                  <source src="/demovedio.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </div>
           </CardContent>

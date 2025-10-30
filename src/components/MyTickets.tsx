@@ -14,14 +14,8 @@ interface TicketData {
   roundName: string;
 }
 
-// Component to fetch tickets for a single round
-function RoundTickets({
-  roundId,
-  userAddress
-}: {
-  roundId: bigint;
-  userAddress: `0x${string}`;
-}) {
+// Hook to fetch tickets for a single round
+function useRoundTickets(roundId: bigint, userAddress: `0x${string}` | undefined) {
   const { data: ticketIndices } = useUserTickets(roundId, userAddress);
   const { data: isWinner } = useIsWinner(roundId, userAddress);
   const { data: roundData } = useRound(roundId);
@@ -53,29 +47,20 @@ export const MyTickets = () => {
   const { address } = useAccount();
   const { data: roundsCount } = useRoundsCount();
 
-  // Create array of round IDs
-  const roundIds = useMemo(() => {
-    const count = Number(roundsCount || 0);
-    return Array.from({ length: count }, (_, i) => BigInt(i));
-  }, [roundsCount]);
+  // Fetch tickets from all rounds
+  const round0Tickets = useRoundTickets(0n, address);
+  const round1Tickets = useRoundTickets(1n, address);
+  const round2Tickets = useRoundTickets(2n, address);
+  const round3Tickets = useRoundTickets(3n, address);
+  const round4Tickets = useRoundTickets(4n, address);
 
-  // Render tickets for each round
-  const allTicketsComponents = useMemo(() => {
-    if (!address) return [];
-
-    return roundIds.map(roundId => (
-      <RoundTickets
-        key={`round-${roundId}`}
-        roundId={roundId}
-        userAddress={address}
-      />
-    ));
-  }, [address, roundIds]);
-
-  // Flatten all tickets
+  // Combine all tickets
   const allTickets = useMemo(() => {
-    return allTicketsComponents.flat();
-  }, [allTicketsComponents]);
+    if (!address) return [];
+    const count = Number(roundsCount || 0);
+    const ticketArrays = [round0Tickets, round1Tickets, round2Tickets, round3Tickets, round4Tickets];
+    return ticketArrays.slice(0, count).flat();
+  }, [address, roundsCount, round0Tickets, round1Tickets, round2Tickets, round3Tickets, round4Tickets]);
 
   if (!address) {
     return (
