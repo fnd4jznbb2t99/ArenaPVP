@@ -14,6 +14,7 @@ declare global {
       SepoliaConfig: Record<string, unknown>;
     };
     ethereum?: any;
+    okxwallet?: any;
   }
 }
 
@@ -24,7 +25,7 @@ let fheInstancePromise: Promise<any> | null = null;
 let sdkPromise: Promise<any> | null = null;
 
 /**
- * Load Relayer SDK from CDN
+ * Dynamically load Zama FHE SDK from CDN
  */
 const loadSdk = async (): Promise<any> => {
   if (typeof window === 'undefined') {
@@ -32,6 +33,7 @@ const loadSdk = async (): Promise<any> => {
   }
 
   if (window.relayerSDK) {
+    console.log('✅ SDK already loaded');
     return window.relayerSDK;
   }
 
@@ -39,23 +41,50 @@ const loadSdk = async (): Promise<any> => {
     sdkPromise = new Promise((resolve, reject) => {
       const existing = document.querySelector(`script[src="${SDK_URL}"]`) as HTMLScriptElement | null;
       if (existing) {
-        existing.addEventListener('load', () => resolve(window.relayerSDK));
-        existing.addEventListener('error', () => reject(new Error('Failed to load FHE SDK')));
+        console.log('⏳ SDK script tag exists, waiting...');
+        // Wait a bit for SDK to initialize
+        const checkInterval = setInterval(() => {
+          if (window.relayerSDK) {
+            clearInterval(checkInterval);
+            resolve(window.relayerSDK);
+          }
+        }, 100);
+
+        setTimeout(() => {
+          clearInterval(checkInterval);
+          if (window.relayerSDK) {
+            resolve(window.relayerSDK);
+          } else {
+            reject(new Error('SDK script exists but window.relayerSDK not initialized'));
+          }
+        }, 5000);
         return;
       }
 
+      console.log('📦 Loading SDK from CDN...');
       const script = document.createElement('script');
       script.src = SDK_URL;
       script.async = true;
-      script.crossOrigin = 'anonymous';
+
       script.onload = () => {
-        if (window.relayerSDK) {
-          resolve(window.relayerSDK);
-        } else {
-          reject(new Error('relayerSDK unavailable after load'));
-        }
+        console.log('📦 Script loaded, waiting for SDK initialization...');
+        // Give SDK time to initialize
+        setTimeout(() => {
+          if (window.relayerSDK) {
+            console.log('✅ SDK initialized');
+            resolve(window.relayerSDK);
+          } else {
+            console.error('❌ window.relayerSDK still undefined after load');
+            reject(new Error('relayerSDK unavailable after load'));
+          }
+        }, 500);
       };
-      script.onerror = () => reject(new Error('Failed to load FHE SDK'));
+
+      script.onerror = () => {
+        console.error('❌ Failed to load SDK script');
+        reject(new Error('Failed to load FHE SDK'));
+      };
+
       document.body.appendChild(script);
     });
   }
@@ -81,62 +110,48 @@ const ensureHandlePayload = (handles: unknown[], inputProof: Uint8Array): { hand
 };
 
 /**
- * Initialize FHE instance for Sepolia network
+ * Initialize FHE instance with Sepolia network configuration
  */
 export async function initializeFHE(provider?: any): Promise<any> {
   if (fheInstance) {
-    console.log('✅ Using cached FHE instance');
     return fheInstance;
   }
 
-  if (fheInstancePromise) {
-    console.log('⏳ Waiting for existing FHE initialization...');
-    return fheInstancePromise;
+  if (typeof window === 'undefined') {
+    throw new Error('FHE SDK requires browser environment');
   }
 
-  fheInstancePromise = (async () => {
-    console.log('🔧 Starting FHE SDK initialization...');
+  const ethereumProvider = provider ||
+    window.ethereum ||
+    (window as any).okxwallet?.provider ||
+    (window as any).okxwallet ||
+    (window as any).coinbaseWalletExtension;
 
-    if (typeof window === 'undefined') {
-      throw new Error('FHE SDK requires browser environment');
-    }
-
-    // Get Ethereum provider
-    const ethereumProvider = provider || window.ethereum;
-
-    if (!ethereumProvider) {
-      console.error('❌ No Ethereum provider found');
-      throw new Error('Ethereum provider not found. Please connect your wallet first.');
-    }
-    console.log('✅ Ethereum provider found');
-
-    const sdk = await loadSdk();
-    if (!sdk) {
-      console.error('❌ FHE SDK not loaded');
-      throw new Error('FHE SDK not available');
-    }
-    console.log('✅ FHE SDK loaded');
-
-    console.log('⏳ Initializing SDK...');
-    await sdk.initSDK();
-    console.log('✅ SDK initialized');
-
-    const config = {
-      ...sdk.SepoliaConfig,
-      network: ethereumProvider,
-    };
-    console.log('⏳ Creating FHE instance with config');
-
-    fheInstance = await sdk.createInstance(config);
-    console.log('✅ FHE instance created successfully');
-    return fheInstance;
-  })();
-
-  try {
-    return await fheInstancePromise;
-  } finally {
-    fheInstancePromise = null;
+  if (!ethereumProvider) {
+    throw new Error('Ethereum provider not found. Please connect your wallet first.');
   }
+
+  console.log('🔌 Using Ethereum provider:', {
+    isOKX: !!(window as any).okxwallet,
+    isMetaMask: !!(window.ethereum as any)?.isMetaMask,
+  });
+
+  const sdk = await loadSdk();
+  if (!sdk) {
+    throw new Error('FHE SDK not available');
+  }
+
+  await sdk.initSDK();
+
+  const config = {
+    ...sdk.SepoliaConfig,
+    network: ethereumProvider,
+  };
+
+  fheInstance = await sdk.createInstance(config);
+  console.log('✅ FHE instance initialized for Sepolia');
+
+  return fheInstance;
 }
 
 /**

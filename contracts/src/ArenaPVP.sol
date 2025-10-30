@@ -123,8 +123,48 @@ contract FHELottery is SepoliaConfig {
         return round.winners;
     }
 
-    /// @notice 
+    /// @notice
     function roundsCount() external view returns (uint256) {
         return rounds.length;
+    }
+
+    /// @notice Get user's ticket indices for a specific round
+    function getUserTickets(uint256 roundId, address user) external view returns (uint256[] memory) {
+        require(roundId < rounds.length, "Round not exist");
+        LotteryRound storage round = rounds[roundId];
+
+        // First pass: count tickets
+        uint256 ticketCount = 0;
+        for (uint256 i = 0; i < round.tickets.length; i++) {
+            if (round.tickets[i].buyer == user) {
+                ticketCount++;
+            }
+        }
+
+        // Second pass: collect indices
+        uint256[] memory ticketIndices = new uint256[](ticketCount);
+        uint256 currentIndex = 0;
+        for (uint256 i = 0; i < round.tickets.length; i++) {
+            if (round.tickets[i].buyer == user) {
+                ticketIndices[currentIndex] = i;
+                currentIndex++;
+            }
+        }
+
+        return ticketIndices;
+    }
+
+    /// @notice Check if user is winner in a round
+    function isWinner(uint256 roundId, address user) external view returns (bool) {
+        require(roundId < rounds.length, "Round not exist");
+        LotteryRound storage round = rounds[roundId];
+        require(round.drawn, "Not drawn yet");
+
+        for (uint256 i = 0; i < round.winners.length; i++) {
+            if (round.winners[i] == user) {
+                return true;
+            }
+        }
+        return false;
     }
 }
